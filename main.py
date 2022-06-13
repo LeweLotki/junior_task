@@ -2,7 +2,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import mysql.connector
 from mysql.connector import Error
-from threading import Thread
+from threading import Thread, Timer
 import schedule
 from time import sleep
 
@@ -42,6 +42,8 @@ class database:
         except Error as err:
             print(err)
 
+    def export_to_excel():pass
+
 class currency:
 
     def __init__(self, url):
@@ -66,6 +68,18 @@ connection = mydb.create_db_connection()
 url_usd = 'https://api.nbp.pl/api/exchangerates/rates/a/usd/'
 url_eur = 'https://api.nbp.pl/api/exchangerates/rates/a/eur/'
 
+def export_spreadsheet():
+    pass
+    print('im here')
+
+def wait_for_input():
+    prompt = None
+    prompt = input('Press Enter to create excel spreadsheet')
+    if prompt != None:
+        export_spreadsheet()
+
+new_thread = Thread(target=wait_for_input, args=())
+
 def main():
 
     currency_usd = currency(url_usd)
@@ -83,8 +97,18 @@ if __name__ == '__main__':
     
     schedule.every().day.at('16:00').do(main)
     while True:
+
+        new_thread.start()
         schedule.run_pending()
         sleep(1)
+        new_thread.join(10)
+        new_thread = Thread(target=wait_for_input, args=())
+    
+
+
+
+
+
 
     
 
