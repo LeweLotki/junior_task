@@ -2,9 +2,10 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import mysql.connector
 from mysql.connector import Error
-from threading import Thread, Timer
+from threading import Thread
 import schedule
 from time import sleep
+import pandas.io.sql as sql
 
 
 class database:
@@ -42,7 +43,10 @@ class database:
         except Error as err:
             print(err)
 
-    def export_to_excel():pass
+    def export_to_excel(self, columns, connection):
+
+        df = sql.read_sql(f'select * from product', connection)
+        df.to_excel('spreadsheet.xlsx')
 
 class currency:
 
@@ -68,17 +72,13 @@ connection = mydb.create_db_connection()
 url_usd = 'https://api.nbp.pl/api/exchangerates/rates/a/usd/'
 url_eur = 'https://api.nbp.pl/api/exchangerates/rates/a/eur/'
 
-def export_spreadsheet():
-    pass
-    print('im here')
-
-def wait_for_input():
+def wait_for_input(mydb, columns, connection):
     prompt = None
     prompt = input('Press Enter to create excel spreadsheet')
     if prompt != None:
-        export_spreadsheet()
+        mydb.export_to_excel(columns, connection)
 
-new_thread = Thread(target=wait_for_input, args=())
+new_thread = Thread(target=wait_for_input, args=(mydb, desired_columns, connection))
 
 def main():
 
@@ -102,7 +102,13 @@ if __name__ == '__main__':
         schedule.run_pending()
         sleep(1)
         new_thread.join(10)
-        new_thread = Thread(target=wait_for_input, args=())
+        new_thread = Thread(target=wait_for_input, args=(mydb, desired_columns, connection))
+    
+
+
+
+
+
     
 
 
